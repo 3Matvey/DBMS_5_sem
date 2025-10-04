@@ -1,10 +1,11 @@
-<img width="1363" height="1172" alt="voting_diagram" src="https://github.com/user-attachments/assets/0d961f34-2469-47ac-a2bc-e67620261202" />
+<img width="1363" height="1172" alt="voting_diagram" src="https://github.com/user-attachments/assets/e4d264d1-78b3-4a04-b8d5-b8e751053e38" />
+
 
 <summary>
   dbdiagram code
   <details>
     <pre><code>
-    Table roles {
+ Table roles {
   id uuid [pk, default: `gen_random_uuid()`]
   code text [not null, unique] // ADMIN, USER
   name text [not null]
@@ -64,7 +65,7 @@ Table candidates {
 
 Table votes {
   id uuid [pk, default: `gen_random_uuid()`]
-  session_id uuid [not null, ref: > voting_sessions.id]
+  //session_id uuid [not null, ref: > voting_sessions.id]
   candidate_id uuid [not null, ref: > candidates.id]
   user_id uuid [not null, ref: > users.id]
   cast_at timestamptz [default: `now()`]
@@ -72,10 +73,10 @@ Table votes {
   is_valid boolean [default: true]
 
   indexes {
-    (session_id)
+    //(session_id)
     (candidate_id)
     (user_id)
-    (session_id, user_id, candidate_id) [unique]
+    (/*session_id,*/ user_id, candidate_id) [unique]
   }
 
   Note: 'Инварианты single/multi-select и совпадение session_id кандидат/голос — триггеры'
@@ -119,6 +120,7 @@ Table audit_logs {
     (created_at)
   }
 }
+
 </code>
 </pre>
 </details>
