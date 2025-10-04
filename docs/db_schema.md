@@ -1,4 +1,4 @@
-<img width="1363" height="1172" alt="voting_diagram" src="https://github.com/user-attachments/assets/e4d264d1-78b3-4a04-b8d5-b8e751053e38" />
+<img width="1596" height="1188" alt="voting_diagram" src="https://github.com/user-attachments/assets/6b5593be-f29e-413e-a67c-0ff6e2b87cfb" />
 
 
 <summary>
@@ -50,22 +50,28 @@ Table voting_settings {
   allow_vote_change_until_close boolean [default: false]
 }
 
+Table candidate_types {
+  id uuid [pk, default: `gen_random_uuid()`]
+  code text [not null, unique] // person | law | org | ...
+  name text [not null]
+}
+
 Table candidates {
   id uuid [pk, default: `gen_random_uuid()`]
   session_id uuid [not null, ref: > voting_sessions.id]
+  candidate_type_id uuid [not null, ref: > candidate_types.id]
   full_name text [not null]
-  program text
-  order_no int [default: 0]
+  description text
 
   indexes {
     (session_id)
     (session_id, full_name) [unique]
+    (candidate_type_id)
   }
 }
 
 Table votes {
   id uuid [pk, default: `gen_random_uuid()`]
-  //session_id uuid [not null, ref: > voting_sessions.id]
   candidate_id uuid [not null, ref: > candidates.id]
   user_id uuid [not null, ref: > users.id]
   cast_at timestamptz [default: `now()`]
@@ -73,10 +79,9 @@ Table votes {
   is_valid boolean [default: true]
 
   indexes {
-    //(session_id)
     (candidate_id)
     (user_id)
-    (/*session_id,*/ user_id, candidate_id) [unique]
+    (user_id, candidate_id) [unique]
   }
 
   Note: 'Инварианты single/multi-select и совпадение session_id кандидат/голос — триггеры'
@@ -106,7 +111,7 @@ Table notifications {
   }
 }
 
-Table audit_logs {
+Table user_logs { // было audit_logs
   id uuid [pk, default: `gen_random_uuid()`]
   user_id uuid [ref: > users.id] // может быть NULL для неуспешных логинов
   action text [not null] // LOGIN | CREATE_SESSION | CAST_VOTE | ...
